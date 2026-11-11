@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#090511" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="description" content="Snake Neon Live: jogue o clássico Snake com visual roxo neon, ranking local, power-ups e efeitos sonoros arcade." />
+    <title>Snake Neon Live — Arcade</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./game.js"></script>
+  </head>
+  <body>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+    <div class="grid-texture" aria-hidden="true"></div>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#inicio" aria-label="Snake Neon Live, voltar ao início">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M29 8H17a9 9 0 0 0 0 18h6a5 5 0 0 1 0 10H10" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><circle cx="29" cy="8" r="5" fill="#fb43bf"/><circle cx="30.4" cy="6.7" r="1" fill="#140519"/></svg></span>
+          <span class="brand-label">SNAKE<span>NEON</span><small>LIVE ARCADE</small></span>
+        </a>
+        <div class="top-actions">
+          <span class="status-chip"><span class="status-dot"></span> MODO ARCADE</span>
+          <button class="icon-button" id="soundToggle" type="button" aria-label="Desativar som" title="Ativar/desativar áudio (M)"><span id="soundToggleIcon">♫</span></button>
+          <button class="icon-button icon-button-help" id="helpToggle" type="button" aria-label="Mostrar instruções" title="Como jogar">?</button>
+        </div>
+      </header>
+
+      <main id="inicio" class="game-layout">
+        <section class="main-column" aria-label="Área do jogo">
+          <div class="stream-header">
+            <div class="live-line"><span class="live-badge"><span></span> AO VIVO</span><span class="live-divider"></span><span>SUA ARENA, SUAS REGRAS</span></div>
+            <div class="stream-heading"><div><p class="eyebrow">O CLÁSSICO REINVENTADO</p><h1>DOMINE O <em>LABIRINTO.</em></h1><p class="intro-copy">Colete frutas, faça combos e ocupe o topo do ranking.</p></div><div class="level-ticket"><small>LEVEL</small><strong id="levelTicket">01</strong><span>NEON MODE</span></div></div>
+          </div>
+
+          <div class="stats-row" aria-label="Placar">
+            <div class="stat-card"><span class="stat-icon">✦</span><div><span class="stat-label">PONTUAÇÃO</span><strong id="scoreValue">0000</strong></div></div>
+            <div class="stat-card"><span class="stat-icon stat-icon-fruit">●</span><div><span class="stat-label">FRUTAS</span><strong><span id="fruitsValue">00</span><span class="stat-suffix">/20</span></strong></div></div>
+            <div class="stat-card"><span class="stat-icon stat-icon-cup">♛</span><div><span class="stat-label">RECORDE</span><strong id="bestValue">0000</strong></div></div>
+          </div>
+
+          <section class="powers-panel" aria-label="Presentes e poderes">
+            <div class="powers-heading"><h2><span class="spark">✦</span> GAMEPLAY GIFTS <span class="heading-sep">/</span> <span class="heading-sub">PODERES ESPECIAIS</span></h2><span class="powers-hint">TOQUE PARA USAR</span></div>
+            <div class="powers-scroll">
+              <div class="powers-grid">
+                <button class="power-card" data-power="snake" type="button" title="Mudar a cor da cobra"><span class="power-emoji">⭐</span><span class="power-name">ESTRELA</span><span class="power-action">COR DA COBRA</span></button>
+                <button class="power-card" data-power="fruit" type="button" title="Mudar a fruta"><span class="power-emoji">🍖</span><span class="power-name">OSSINHO</span><span class="power-action">MUDAR FRUTA</span></button>
+                <button class="power-card" data-power="apples" type="button" title="Colocar mais cinco frutas"><span class="power-emoji">🪙</span><span class="power-name">MOEDA</span><span class="power-action">+5 FRUTAS</span></button>
+                <button class="power-card" data-power="turbo" type="button" title="Aumentar a velocidade por alguns segundos"><span class="power-emoji">⚡</span><span class="power-name">TURBO</span><span class="power-action">VELOCIDADE</span></button>
+                <button class="power-card" data-power="party" type="button" title="Ativar comemoração"><span class="power-emoji">🎉</span><span class="power-name">FESTA</span><span class="power-action">CONFETE</span></button>
+                <button class="power-card" data-power="bomb" type="button" title="Colocar uma bomba na arena"><span class="power-emoji">💣</span><span class="power-name">BOMBA</span><span class="power-action">ARMADILHA</span></button>
+                <button class="power-card power-card-danger" data-power="rip" type="button" title="Encerrar a rodada"><span class="power-emoji">💀</span><span class="power-name">RIP LIVE</span><span class="power-action">GAME OVER</span></button>
+              </div>
+            </div>
+          </section>
+
+          <section class="board-section" aria-label="Tabuleiro Snake">
+            <div class="board-topline"><span><span class="board-led"></span> SNAKE.EXE <span class="board-topline-soft">— ARENA 01</span></span><span id="statusLabel">AGUARDANDO JOGADOR</span></div>
+            <div class="board-frame" id="boardFrame">
+              <div class="board-inner">
+                <canvas id="gameCanvas" width="780" height="780" tabindex="0" aria-label="Tabuleiro do jogo Snake. Use as setas, WASD ou deslize o dedo para mover a cobra."></canvas>
+                <div class="board-scanlines" aria-hidden="true"></div>
+                <div class="particles-layer" id="particlesLayer" aria-hidden="true"></div>
+                <div class="board-toast" id="boardToast" role="status" aria-live="polite"></div>
+
+                <div class="game-overlay" id="gameOverlay">
+                  <div class="overlay-panel" data-screen="ready">
+                    <div class="overlay-symbol" aria-hidden="true">🐍</div>
+                    <span class="overlay-kicker">READY PLAYER ONE?</span>
+                    <h2>A SUA VEZ<br /><em>DE BRILHAR.</em></h2>
+                    <p>Coma 20 frutas para vencer. Uma batida e a rodada termina!</p>
+                    <label class="name-label" for="playerName">SEU NOME NO RANKING</label>
+                    <input id="playerName" maxlength="16" placeholder="Digite seu apelido" autocomplete="nickname" spellcheck="false" value="Jogador" />
+                    <button class="primary-button" id="startButton" type="button">▶ &nbsp; COMEÇAR JOGO</button>
+                    <span class="overlay-tip">SETAS / WASD / TOUCH / CONTROLE 🎮</span>
+                  </div>
+                  <div class="overlay-panel" data-screen="paused" hidden>
+                    <div class="overlay-symbol" aria-hidden="true">⏸</div>
+                    <span class="overlay-kicker">TEMPO CONGELADO</span>
+                    <h2>JOGO <em>PAUSADO.</em></h2>
+                    <p>Respire. A cobra está esperando por você.</p>
+                    <button class="primary-button" id="resumeButton" type="button">▶ &nbsp; CONTINUAR</button>
+                    <span class="overlay-tip">ESPAÇO, START OU A PARA RETOMAR</span>
+                  </div>
+                  <div class="overlay-panel" data-screen="finished" hidden>
+                    <div class="overlay-symbol" id="endSymbol" aria-hidden="true">💀</div>
+                    <span class="overlay-kicker" id="endKicker">FIM DA RODADA</span>
+                    <h2 id="endTitle">GAME <em>OVER.</em></h2>
+                    <p id="endDescription">A cobra bateu na parede.</p>
+                    <div class="final-score"><span>SUA PONTUAÇÃO</span><strong id="finalScore">0000</strong></div>
+                    <button class="primary-button" id="restartButton" type="button">↻ &nbsp; JOGAR NOVAMENTE</button>
+                    <button class="text-button" id="endlessButton" type="button" hidden>CONTINUAR EM MODO INFINITO</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="board-under"><div><span class="neon-dot"></span><span id="modeIndicator">MODO CLÁSSICO</span></div><span>🍎 <span id="goalText">OBJETIVO: 20 FRUTAS</span></span></div>
+          </section>
+
+          <div class="game-controls"><div class="desktop-buttons"><button type="button" class="secondary-button" id="pauseButton">⏸ <span>PAUSAR</span></button><button type="button" class="secondary-button" id="newGameButton">↻ <span>REINICIAR</span></button></div><p class="control-hint"><span class="keycap">↑</span><span class="keycap">←</span><span class="keycap">↓</span><span class="keycap">→</span> OU <span class="keycap">WASD</span> PARA MOVER · <span class="keycap">ESPAÇO</span> PAUSA</p></div>
+          <div class="controller-status" aria-live="polite" aria-atomic="true">
+            <span class="controller-badge" id="controllerBadge">🎮 AGUARDANDO</span>
+            <div class="controller-copy"><strong id="controllerName">Controle USB / Bluetooth</strong><small id="controllerHint">Conecte pelo PC ou pareie nas configurações Bluetooth do celular, depois pressione um botão.</small></div>
+          </div>
+
+          <div class="touch-controls" aria-label="Controles de direção para celular"><span class="touch-caption">CONTROLES MOBILE</span><div class="dpad"><button data-direction="up" class="dir-up" type="button" aria-label="Mover para cima">↑</button><button data-direction="left" class="dir-left" type="button" aria-label="Mover para a esquerda">←</button><button data-direction="down" class="dir-down" type="button" aria-label="Mover para baixo">↓</button><button data-direction="right" class="dir-right" type="button" aria-label="Mover para a direita">→</button></div><span class="touch-tip">OU DESLIZE DIRETAMENTE NO TABULEIRO</span></div>
+        </section>
+
+        <aside class="side-column" aria-label="Ranking e instruções">
+          <section class="side-card leaderboard-card">
+            <div class="side-heading"><span class="side-eyebrow">HALL DA FAMA</span><span class="mini-chip">TOP 08</span></div>
+            <h2><span>🏆</span> RANKING <em>NEON</em></h2>
+            <p class="side-desc">As melhores partidas neste dispositivo.</p>
+            <div class="leaderboard" id="leaderboard" aria-live="polite"></div>
+            <div class="ranking-footer"><span>✦</span><span>SUA HISTÓRIA COMEÇA AQUI</span><span>✦</span></div>
+          </section>
+
+          <section class="side-card mission-card"><div class="side-heading"><span class="side-eyebrow">SUA MISSÃO</span><span class="mini-chip mini-chip-green">01 / 01</span></div><h2>COMO <em>JOGAR</em></h2><div class="mission-step"><span class="mission-icon">🎮</span><div><strong>MOVA A COBRA</strong><p>Setas, WASD ou gestos na tela. Não encoste no corpo ou nas paredes.</p></div></div><div class="mission-step"><span class="mission-icon">🍎</span><div><strong>COLETE AS FRUTAS</strong><p>Cada fruta aumenta a cobra, os pontos e a dificuldade.</p></div></div><div class="mission-step"><span class="mission-icon">🏁</span><div><strong>CHEGUE À VITÓRIA</strong><p>Coma 20 frutas para vencer e registrar seu resultado no ranking.</p></div></div><div class="mission-progress"><div class="mission-progress-label"><span>PROGRESSO DA MISSÃO</span><strong id="progressText">0%</strong></div><div class="progress-track"><div id="progressFill"></div></div></div></section>
+
+          <section class="side-card sound-card"><div class="side-heading"><span class="side-eyebrow">EFEITOS SONOROS</span><span class="mini-chip mini-chip-sound">SFX ON</span></div><h2>SOUND <em>CHECK</em></h2><p class="side-desc">Toque para ouvir cada efeito do jogo.</p><div class="sound-list"><button type="button" data-sound="move"><span>➜</span> MOVIMENTO <span class="play-mark">▶</span></button><button type="button" data-sound="eat"><span>🍎</span> COMER FRUTA <span class="play-mark">▶</span></button><button type="button" data-sound="death"><span>☠</span> MORTE <span class="play-mark">▶</span></button><button type="button" data-sound="win"><span>🏆</span> VITÓRIA <span class="play-mark">▶</span></button><button type="button" data-sound="gameover"><span>✖</span> GAME OVER <span class="play-mark">▶</span></button></div></section>
+        </aside>
+      </main>
+
+      <footer class="footer"><span>© 2026 SNAKE NEON LIVE <b>✦</b> CRIADO PARA RAPHAEL LAURENTINO</span><span>HTML · CSS · JAVASCRIPT <b>✦</b> SEM DEPENDÊNCIAS</span></footer>
+    </div>
+
+    <dialog id="helpDialog" class="help-dialog"><div class="help-content"><button id="helpClose" class="help-close" type="button" aria-label="Fechar">×</button><span class="overlay-kicker">GUIA RÁPIDO</span><h2>COMO JOGAR</h2><p>No <b>PC</b>, use as setas ou <b>WASD</b>. No <b>celular</b>, deslize o dedo sobre o tabuleiro ou toque nas setas virtuais.</p><p>Com um <b>controle USB ou Bluetooth</b>, use o direcional digital ou o analógico esquerdo. <b>A</b> inicia/retoma e <b>START/Menu</b> pausa. Pareie o controle no sistema do celular antes de abrir o jogo.</p><p>Coma <b>20 frutas</b> para ganhar. Evite as paredes, seu corpo e as bombas. Espaço pausa, R reinicia e M liga/desliga o áudio.</p><button id="helpOk" class="primary-button" type="button">ENTENDI!</button></div></dialog>
+  </body>
+</html>
